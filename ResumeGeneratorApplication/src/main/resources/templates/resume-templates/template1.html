@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Tags now have full closing tags for the strict PDF parser -->
+    <meta charset="UTF-8"></meta>
+    <title>Modern Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet"></link>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #2c3e50;
+        }
+        .header .contact-info {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .contact-info a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            font-size: 1.5em;
+            color: #3498db;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .summary p {
+            font-style: italic;
+        }
+        .experience-item, .education-item {
+            margin-bottom: 20px;
+        }
+        .experience-item h3, .education-item h3 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+        .experience-item .company, .education-item .institution {
+            font-weight: bold;
+            color: #555;
+        }
+        .experience-item .duration, .education-item .grad-year {
+            font-size: 0.9em;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        .skills-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .skills-list li {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 12px;
+            margin: 5px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 th:text="${resume.name}">John Doe</h1>
+        <div class="contact-info">
+            <span th:text="${resume.email}">john.doe@email.com</span> |
+            <span th:text="${resume.phone}">(123) 456-7890</span> |
+            <span th:text="${resume.address}">Anytown, USA</span>
+            <div th:if="${resume.linkedin != null and resume.linkedin != '' or resume.website != null and resume.website != ''}">
+                <a th:if="${resume.linkedin != null and resume.linkedin != ''}" th:href="${resume.linkedin}" th:text="${resume.linkedin}">linkedin.com/in/johndoe</a>
+                <span th:if="${resume.linkedin != null and resume.linkedin != '' and resume.website != null and resume.website != ''}">|</span>
+                <a th:if="${resume.website != null and resume.website != ''}" th:href="${resume.website}" th:text="${resume.website}">johndoe.com</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="section summary">
+        <h2>Professional Summary</h2>
+        <p th:text="${resume.summary}">A brief summary about the professional.</p>
+    </div>
+
+    <div class="section experience">
+        <h2>Work Experience</h2>
+        <div class="experience-item" th:each="exp : ${resume.experiences}">
+            <h3 th:text="${exp.jobTitle}">Senior Developer</h3>
+            <div class="company" th:text="${exp.company}">Tech Solutions Inc.</div>
+            <div class="duration" th:text="${exp.duration}">2020 - Present</div>
+            <p th:text="${exp.description}">Description of responsibilities and achievements.</p>
+        </div>
+    </div>
+
+    <div class="section education">
+        <h2>Education</h2>
+        <div class="education-item" th:each="edu : ${resume.educations}">
+            <h3 th:text="${edu.degree}">Bachelor of Science in Computer Science</h3>
+            <div class="institution" th:text="${edu.institution}">University of Technology</div>
+            <div class="grad-year" th:text="${edu.gradYear}">Graduated: 2020</div>
+        </div>
+    </div>
+
+    <div class="section skills">
+        <h2>Skills</h2>
+        <ul class="skills-list">
+            <li th:each="skill : ${resume.skills}" th:text="${skill}">Java</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
+
