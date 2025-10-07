@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>NextGenHire - Professional Resume Generator</title>
+    <!-- Google Font Import -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:800" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Root variables for font sizes */
+        :root {
+            --font-nav: 1rem;
+            --font-main-button: 1.5rem;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            /* NEW professional background */
+            background: url('https://images.unsplash.com/photo-1557682250-33bd709cbe85?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            background-color: rgba(0,0,0,0.5);
+            background-blend-mode: darken;
+            font-family: 'Open Sans', sans-serif;
+            color: white;
+            position: relative;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Section Styling */
+        section {
+            padding: 80px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .content-box {
+            background-color: rgba(0,0,0, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background-color: rgba(0,0,0, 0.2) !important;
+            backdrop-filter: blur(50px);
+            -webkit-backdrop-filter: blur(50px);
+        }
+
+        /* Custom Button Styling */
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            font-family: 'Open Sans', sans-serif;
+            font-size: var(--font-nav);
+            border-radius: calc(var(--font-nav) * 0.6);
+            padding: calc(var(--font-nav) * 0.5) calc(var(--font-nav) * 1);
+            line-height: 1;
+            position: relative;
+            background-color: transparent;
+            color: white;
+            box-shadow: inset 0 0 0 0 rgb(248 249 255 / 50%), inset 0 0 0 0 rgb(248 249 255 / 30%), 0 0 0 rgb(248 249 255 / 20%);
+            transition: all ease 0.2s;
+            text-decoration: none;
+            margin: 0 0.5rem;
+        }
+
+        .nav-btn:hover {
+            color: white;
+            box-shadow: inset 0 0 0 calc(var(--font-nav) * 0.2) rgb(248 249 255 / 50%), inset 0 0 calc(var(--font-nav) * 0.2) calc(var(--font-nav) * 0.5) rgb(248 249 255 / 30%), 0 0 calc(var(--font-nav) * 0.2) rgb(248 249 255 / 20%);
+        }
+
+        .nav-btn::before {
+            content: '';
+            height: 110%;
+            width: 105%;
+            position: absolute;
+            border-radius: calc(var(--font-nav) * 0.8);
+            background-color: transparent;
+        }
+
+        @keyframes borders {
+            0%, 100% { border-width: calc(var(--font-nav) * 0.2) calc(var(--font-nav) * 0.1) calc(var(--font-nav) * 0.02) calc(var(--font-nav) * 0.02); }
+            25% { border-width: calc(var(--font-nav) * 0.1) calc(var(--font-nav) * 0.02) calc(var(--font-nav) * 0.02) calc(var(--font-nav) * 0.2); }
+            50% { border-width: calc(var(--font-nav) * 0.02) calc(var(--font-nav) * 0.02) calc(var(--font-nav) * 0.2) calc(var(--font-nav) * 0.1); }
+            75% { border-width: calc(var(--font-nav) * 0.02) calc(var(--font-nav) * 0.2) calc(var(--font-nav) * 0.1) calc(var(--font-nav) * 0.02); }
+        }
+
+        .nav-btn:hover::before {
+            border: solid rgb(210 255 227 / 80%);
+            padding: calc(var(--font-nav) * 0.08);
+            box-shadow: inset 0 0 calc(var(--font-nav) * 0.2) calc(var(--font-nav) * 0.2) rgb(186 201 255 / 30%);
+            filter: blur(calc(var(--font-nav) * 0.06));
+            animation: borders infinite 2s linear;
+            opacity: 0.5;
+        }
+
+        .nav-btn .btn-span {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            overflow: hidden;
+            display: flex;
+            border-radius: calc(var(--font-nav) * 0.6);
+            z-index: -1;
+        }
+
+        .nav-btn .btn-span::after {
+            content: '';
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            background: linear-gradient(90deg, rgb(248 249 255 / 0%), rgb(206 216 255 / 60%), rgb(248 249 255 / 0%));
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        .nav-btn:hover > .btn-span::after {
+            opacity: 1;
+            transform: translateX(100%);
+            transition: all ease 1s;
+        }
+        
+        .nav-btn.active {
+            background-color: white;
+            color: black;
+        }
+        
+        /* CORRECTED Large Button Style */
+        .main-action-btn {
+            --font: var(--font-main-button);
+            color: white;
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            box-shadow: inset 0 0 0 0 rgb(248 249 255 / 50%);
+            position: relative;
+            font-size: var(--font);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all ease 0.3s;
+            background-color: #6f42c1;
+            border: 2px solid #6f42c1;
+        }
+        
+        .main-action-btn.secondary {
+             background-color: transparent;
+             border: 2px solid white;
+        }
+
+        .main-action-btn:hover {
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer {
+            background-color: rgba(0,0,0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px 0;
+            text-align: center;
+        }
+        
+        h1, h2 {
+            font-style: italic;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#mainNav">
+
+<!-- Navigation Bar -->
+<nav id="mainNav" class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand text-white" href="#">NextGenHire</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav ms-auto d-flex align-items-center">
+                <a class="nav-btn" href="#home">Home <span class="btn-span"></span></a>
+                <a class="nav-btn" href="#about">About Us <span class="btn-span"></span></a>
+                <a class="nav-btn" href="#contact">Contact Us <span class="btn-span"></span></a>
+                <a class="nav-btn" th:href="@{/history}">History <span class="btn-span"></span></a>
+                <a class="nav-btn active" th:href="@{/generate}">Create Resume <span class="btn-span"></span></a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Home Section -->
+<section id="home">
+    <div class="container text-center">
+         <div class="row align-items-center">
+            <div class="col-lg-6 text-lg-start">
+                <h1 class="display-3 fw-bold lh-1 mb-3">Craft Your Professional Story</h1>
+                <p class="lead fs-4">Welcome to NextGenHire, the simplest way to build a professional, polished resume in minutes.</p>
+                <div class="d-grid gap-3 d-md-flex justify-content-md-start mt-4">
+                    <a th:href="@{/generate}" class="main-action-btn">
+                        Create My Resume
+                    </a>
+                    <a th:href="@{/history}" class="main-action-btn secondary">
+                         View History
+                    </a>
+                </div>
+            </div>
+             <div class="col-lg-6">
+                <img src="https://placehold.co/700x500/6f42c1/ffffff?text=Professional+Resumes" class="d-block mx-lg-auto img-fluid rounded" alt="Resume illustration" width="700" height="500" loading="lazy">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Us Section -->
+<section id="about">
+    <div class="container content-box">
+        <div class="text-center">
+            <h1 class="display-4">Our Mission</h1>
+            <p class="col-lg-8 mx-auto fs-5 text-white-50">
+                At NextGenHire, our mission is to simplify the job application process. We believe everyone deserves a fair chance to showcase their skills and experience without worrying about complex document formatting.
+            </p>
+        </div>
+        <div class="row mt-5">
+             <div class="col-md-6">
+                <h2>The Technology</h2>
+                <p>This application is built with a powerful tech stack, including Java Spring Boot, Thymeleaf, and a robust MySQL database. The secure and efficient design ensures a smooth user experience.</p>
+             </div>
+             <div class="col-md-6">
+                <h2>Why Choose Us?</h2>
+                <p>Unlike other tools, NextGenHire is designed for simplicity. Our intuitive interface and professionally designed templates ensure your final document is clean, readable, and ready for any job application.</p>
+             </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Us Section -->
+<section id="contact">
+    <div class="container content-box col-md-8">
+        <div class="text-center mb-5">
+            <h1 class="display-4">Get in Touch</h1>
+            <p class="lead text-white-50">We'd love to hear from you. Please feel free to reach out with any questions or feedback.</p>
+        </div>
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+               <h5 class="card-title text-center">Contact Information</h5>
+               <p class="text-center"><strong>Project Location:</strong> Manalur, Kerala, India</p>
+               <p class="text-center"><strong>Email:</strong> <a href="mailto:contact@nextgenhire.com" class="text-white">contact@nextgenhire.com</a></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <p class="mb-0">&copy; 2025 NextGenHire. All Rights Reserved. Manalur, Kerala.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

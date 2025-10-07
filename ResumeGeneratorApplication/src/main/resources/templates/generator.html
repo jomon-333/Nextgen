@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Resume Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .template-preview {
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 10px;
+            transition: border-color 0.3s;
+            cursor: pointer;
+        }
+        .template-preview img {
+            width: 15%;
+            border-radius: 6px;
+        }
+        input[type="radio"]:checked + .template-preview {
+            border-color: #0d6efd;
+        }
+        .btn-primary {
+            background-color: #6f42c1;
+            border-color: #6f42c1;
+        }
+    </style>
+</head>
+<body>
+<div class="container my-5">
+    <div class="card">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-4">
+            <h1 class="h3 mb-0">Create Your Resume</h1>
+            <a th:href="@{/history}" class="btn btn-outline-secondary btn-sm">View History</a>
+        </div>
+        <div class="card-body p-4 p-md-5">
+
+            <!-- Error Message Box -->
+            <div id="error-message-box" class="alert alert-danger d-none" role="alert"></div>
+
+            <form id="resume-form" th:action="@{/download}" th:object="${resumeData}" method="post" enctype="multipart/form-data">
+                <!-- Template Selection -->
+                <div class="mb-5">
+                    <h2 class="h5 mb-3">1. Choose a Template</h2>
+                    <div class="row">
+                        <div class="col-md-6 text-center">
+                            <label for="template1" class="d-block">
+                                <input type="radio" name="template" id="template1" value="template1.html" class="d-none" checked="checked"/>
+                                <div class="template-preview">
+                                    <img src="https://placehold.co/400x566/6a11cb/ffffff?text=Modern" alt="Modern Template Preview"/>
+                                    <p class="mt-2 mb-0 fw-bold">Modern</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <label for="template2" class="d-block">
+                                <input type="radio" name="template" id="template2" value="template2.html" class="d-none"/>
+                                <div class="template-preview">
+                                    <img src="https://placehold.co/400x566/2575fc/ffffff?text=Classic" alt="Classic Template Preview"/>
+                                    <p class="mt-2 mb-0 fw-bold">Classic</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Information -->
+                <div class="mb-4">
+                    <h2 class="h5 mb-3">2. Personal Information</h2>
+                     <!-- Photo Upload Field -->
+                    <div class="mb-3">
+                        <label for="photoUpload" class="form-label">Profile Photo (Optional)</label>
+                        <input type="file" class="form-control" id="photoUpload" name="photoUpload" accept="image/png, image/jpeg"/>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="e.g., John Doe" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="e.g., john.doe@example.com" required/>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" th:field="*{phone}"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="address" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="address" th:field="*{address}" placeholder="City, Country"/>
+                        </div>
+                         <div class="col-md-6">
+                            <label for="linkedin" class="form-label">LinkedIn Profile URL</label>
+                            <input type="url" class="form-control" id="linkedin" th:field="*{linkedin}"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="website" class="form-label">Personal Website/Portfolio URL</label>
+                            <input type="url" class="form-control" id="website" th:field="*{website}"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="mb-4">
+                    <label for="summary" class="form-label h5">3. Professional Summary</label>
+                    <textarea class="form-control" id="summary" th:field="*{summary}" rows="4" placeholder="Write a brief summary about your career..."></textarea>
+                </div>
+
+                <!-- Work Experience -->
+                <div class="mb-4 dynamic-list" id="experience-list">
+                    <h2 class="h5 mb-3">4. Work Experience</h2>
+                    <div th:each="exp, stat : *{experiences}" class="row g-3 mb-3 border p-3 rounded position-relative">
+                        <div class="col-12">
+                            <button type="button" class="btn-close position-absolute top-0 end-0 p-3" aria-label="Close" onclick="this.closest('.row').remove()"></button>
+                        </div>
+                        <div class="col-md-6">
+                            <label th:for="${'exp-title-' + stat.index}" class="form-label">Job Title</label>
+                            <input type="text" th:id="${'exp-title-' + stat.index}" class="form-control" th:field="*{experiences[__${stat.index}__].jobTitle}"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label th:for="${'exp-company-' + stat.index}" class="form-label">Company</label>
+                            <input type="text" th:id="${'exp-company-' + stat.index}" class="form-control" th:field="*{experiences[__${stat.index}__].company}"/>
+                        </div>
+                        <div class="col-md-12">
+                            <label th:for="${'exp-duration-' + stat.index}" class="form-label">Duration</label>
+                            <input type="text" th:id="${'exp-duration-' + stat.index}" class="form-control" th:field="*{experiences[__${stat.index}__].duration}" placeholder="e.g., 2020 - Present"/>
+                        </div>
+                        <div class="col-md-12">
+                             <label th:for="${'exp-desc-' + stat.index}" class="form-label">Description</label>
+                            <textarea class="form-control" th:id="${'exp-desc-' + stat.index}" th:field="*{experiences[__${stat.index}__].description}" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="addExperience()">+ Add Experience</button>
+                </div>
+
+                <!-- Education -->
+                 <div class="mb-4 dynamic-list" id="education-list">
+                    <h2 class="h5 mb-3">5. Education</h2>
+                    <div th:each="edu, stat : *{educations}" class="row g-3 mb-3 border p-3 rounded position-relative">
+                        <div class="col-12">
+                           <button type="button" class="btn-close position-absolute top-0 end-0 p-3" aria-label="Close" onclick="this.closest('.row').remove()"></button>
+                        </div>
+                        <div class="col-md-6">
+                            <label th:for="${'edu-degree-' + stat.index}" class="form-label">Degree</label>
+                            <input type="text" th:id="${'edu-degree-' + stat.index}" class="form-control" th:field="*{educations[__${stat.index}__].degree}"/>
+                        </div>
+                        <div class="col-md-6">
+                            <label th:for="${'edu-institution-' + stat.index}" class="form-label">Institution</label>
+                            <input type="text" th:id="${'edu-institution-' + stat.index}" class="form-control" th:field="*{educations[__${stat.index}__].institution}"/>
+                        </div>
+                         <div class="col-md-12">
+                            <label th:for="${'edu-gradYear-' + stat.index}" class="form-label">Graduation Year</label>
+                            <input type="text" th:id="${'edu-gradYear-' + stat.index}" class="form-control" th:field="*{educations[__${stat.index}__].gradYear}"/>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="addEducation()">+ Add Education</button>
+                </div>
+
+                <!-- Skills -->
+                <div class="mb-5 dynamic-list" id="skills-list">
+                    <h2 class="h5 mb-3">6. Skills</h2>
+                    <div th:each="skill, stat : *{skills}" class="row g-3 mb-2 align-items-center">
+                        <div class="col">
+                            <input type="text" class="form-control" th:field="*{skills[__${stat.index}__]}" placeholder="e.g., Java"/>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.row').remove()">Remove</button>
+                        </div>
+                    </div>
+                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="addSkill()">+ Add Skill</button>
+                </div>
+
+
+                <div class="text-center">
+                    <button id="submit-btn" type="submit" class="btn btn-primary btn-lg px-5">
+                        <span id="submit-btn-text">Generate & Download PDF</span>
+                        <span id="submit-btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('resume-form').addEventListener('submit', function(event) {
+        // Prevent the form from submitting immediately
+        event.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const errorBox = document.getElementById('error-message-box');
+        
+        // Simple validation
+        if (name.trim() === '' || email.trim() === '') {
+            errorBox.textContent = 'Please fill in all required fields: Full Name and Email Address.';
+            errorBox.classList.remove('d-none'); // Show the error box
+            window.scrollTo(0, 0); // Scroll to the top to see the message
+            return; // Stop the function
+        }
+        
+        // If validation passes, hide the error box and show loading state
+        errorBox.classList.add('d-none');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = document.getElementById('submit-btn-text');
+        const btnSpinner = document.getElementById('submit-btn-spinner');
+
+        submitBtn.disabled = true;
+        btnText.textContent = 'Generating...';
+        btnSpinner.classList.remove('d-none');
+
+        // Allow the form to submit
+        this.submit();
+    });
+
+    function addExperience() {
+        const list = document.getElementById('experience-list');
+        const count = list.querySelectorAll('.row').length;
+        const newRowHTML = `
+            <div class="row g-3 mb-3 border p-3 rounded position-relative">
+                 <div class="col-12">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 p-3" aria-label="Close" onclick="this.closest('.row').remove()"></button>
+                </div>
+                <div class="col-md-6">
+                    <label for="exp-title-${count}" class="form-label">Job Title</label>
+                    <input type="text" id="exp-title-${count}" name="experiences[${count}].jobTitle" class="form-control"/>
+                </div>
+                <div class="col-md-6">
+                    <label for="exp-company-${count}" class="form-label">Company</label>
+                    <input type="text" id="exp-company-${count}" name="experiences[${count}].company" class="form-control"/>
+                </div>
+                <div class="col-md-12">
+                    <label for="exp-duration-${count}" class="form-label">Duration</label>
+                    <input type="text" id="exp-duration-${count}" name="experiences[${count}].duration" class="form-control" placeholder="e.g., 2020 - Present"/>
+                </div>
+                <div class="col-md-12">
+                    <label for="exp-desc-${count}" class="form-label">Description</label>
+                    <textarea class="form-control" id="exp-desc-${count}" name="experiences[${count}].description" rows="3"></textarea>
+                </div>
+            </div>
+        `;
+        const button = list.querySelector('button');
+        button.insertAdjacentHTML('beforebegin', newRowHTML);
+    }
+
+    function addEducation() {
+        const list = document.getElementById('education-list');
+        const count = list.querySelectorAll('.row').length;
+        const newRowHTML = `
+            <div class="row g-3 mb-3 border p-3 rounded position-relative">
+                <div class="col-12">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 p-3" aria-label="Close" onclick="this.closest('.row').remove()"></button>
+                </div>
+                <div class="col-md-6">
+                    <label for="edu-degree-${count}" class="form-label">Degree</label>
+                    <input type="text" id="edu-degree-${count}" name="educations[${count}].degree" class="form-control"/>
+                </div>
+                <div class="col-md-6">
+                    <label for="edu-institution-${count}" class="form-label">Institution</label>
+                    <input type="text" id="edu-institution-${count}" name="educations[${count}].institution" class="form-control"/>
+                </div>
+                <div class="col-md-12">
+                    <label for="edu-gradYear-${count}" class="form-label">Graduation Year</label>
+                    <input type="text" id="edu-gradYear-${count}" name="educations[${count}].gradYear" class="form-control"/>
+                </div>
+            </div>
+        `;
+        const button = list.querySelector('button');
+        button.insertAdjacentHTML('beforebegin', newRowHTML);
+    }
+
+    function addSkill() {
+        const list = document.getElementById('skills-list');
+        const count = list.querySelectorAll('.row').length;
+        const newRowHTML = `
+            <div class="row g-3 mb-2 align-items-center">
+                <div class="col">
+                    <input type="text" name="skills[${count}]" class="form-control" placeholder="e.g., Java"/>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.row').remove()">Remove</button>
+                </div>
+            </div>
+        `;
+        const button = list.querySelector('button');
+        button.insertAdjacentHTML('beforebegin', newRowHTML);
+    }
+</script>
+
+</body>
+</html>
+
